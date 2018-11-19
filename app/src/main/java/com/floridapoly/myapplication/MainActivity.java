@@ -1,17 +1,132 @@
 package com.floridapoly.myapplication;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Toast.makeText(this,"Map is ready", Toast.LENGTH_LONG).show();
+        Log.d(TAG, "onmap: ready" + googleMap);
+
+        //mMap = googleMap;
+    }
+    private static final String TAG = "MainActivity";
+
+    private static final int ERROR_DIALOG_REQUEST = 9001;
+
+    private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
+    private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+
+    private Boolean mLocationPermissionGranted = false;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        getLocationPermission();
 
-        //Test commit
 
     }
+
+    public boolean isServicesOK(){
+        Log.d(TAG, "isServicesOK: checking google services version");
+
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+
+        if(available == ConnectionResult.SUCCESS){
+            //Everything is coo
+            Log.d(TAG, "isServicesOK: Services is working");
+
+        }
+        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            Log.d(TAG, "isServicesOK: ResolvableError");
+        }else{
+            Toast.makeText(this, "Can't make map", Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }
+
+    private void initMap(){
+        Log.d(TAG, "initmap: init");
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
+        Log.d(TAG, "init map: fragment is " + mapFragment);
+
+        mapFragment.getMapAsync(MainActivity.this);
+    }
+
+
+    private void getLocationPermission(){
+        Log.d(TAG, "getLocationPermission: getting location perms");
+
+        String[] permissions = {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        };
+        Log.d(TAG, "getLocationPermission: array init");
+
+        if(ContextCompat.checkSelfPermission(this.getApplicationContext(), FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            Log.d(TAG, "getLocationPermission: first if");
+
+            if(ContextCompat.checkSelfPermission(this.getApplicationContext(), COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                Log.d(TAG, "getLocationPermission: second if");
+
+                mLocationPermissionGranted = true;
+                Log.d(TAG, "getLocationPermission: permissions already given");
+                initMap();
+            }else{
+                Log.d(TAG, "getLocationPermission: gonna ask");
+
+                ActivityCompat.requestPermissions(this, permissions,LOCATION_PERMISSION_REQUEST_CODE);
+            }
+        }else{
+            Log.d(TAG, "getLocationPermission: gonna ask 1st");
+            ActivityCompat.requestPermissions(this, permissions,LOCATION_PERMISSION_REQUEST_CODE);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult: called");
+
+        mLocationPermissionGranted = false;
+
+        switch(requestCode){
+            case LOCATION_PERMISSION_REQUEST_CODE:{
+                if(grantResults.length > 0 ){
+                    for(int i = 0; i < grantResults.length; i++){
+                        if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                            mLocationPermissionGranted = false;
+                            return;
+                        }
+                    }
+                    mLocationPermissionGranted = true;
+                    //initialize map
+                    initMap();
+                }
+            }
+        }
+    }
+
+
 }
