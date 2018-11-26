@@ -2,7 +2,9 @@ package com.floridapoly.myapplication;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.VpnService;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Toast.makeText(this,"Map is ready", Toast.LENGTH_LONG).show();
         Log.d(TAG, "onmap: ready" + googleMap);
 
-        //mMap = googleMap;
+        mMap = googleMap;
     }
     private static final String TAG = "MainActivity";
 
@@ -42,10 +44,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+         Intent intent = VpnService.prepare(this);
+         if(intent != null){
+             startActivityForResult(intent, 0);
+         }else{
+             Log.d("test", "Intet: ELSE LOOP");
+            onActivityResult(0, RESULT_OK, null);
+         }
+        //packetVPN myVpm = new packetVPN();
+        //myVpm.run();
         getLocationPermission();
 
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK){
+            Log.d("test", "Coo");
+            startService((new Intent(this, packetVPN.class)).setAction(packetVPN.ACTION_CONNECT));
+        }
+    }
+
+
 
     public boolean isServicesOK(){
         Log.d(TAG, "isServicesOK: checking google services version");

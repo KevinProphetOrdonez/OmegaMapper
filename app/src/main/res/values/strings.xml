@@ -4,5 +4,6 @@
     <string name="app_name">My Application</string>
     <string name="livesafe_latitude">1</string>
     <string name="livesafe_longitude">1</string>
+    <string name="disconnected">Beware</string>
 
 </resources>
