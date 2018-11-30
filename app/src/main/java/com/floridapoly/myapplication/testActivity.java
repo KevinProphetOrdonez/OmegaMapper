@@ -38,11 +38,17 @@ public class testActivity extends AppCompatActivity {
         readBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                PacketReader packetReader = new PacketReader(testActivity.this);
+
                 try {
-                    readPacketFile();
+                    //readPacketFile();
+                    packetReader.readPacketFile();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             }
         });
         mapBtn.setOnClickListener(new View.OnClickListener() {

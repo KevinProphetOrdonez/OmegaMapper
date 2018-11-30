@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.VpnService;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -21,7 +22,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.Gradient;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
 
@@ -51,7 +58,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(new Intent(MainActivity.this, testActivity.class));
             }
         });
+///////////////////////////////////////////////
 
+///////////////////////////////////////////////
 
         getLocationPermission();
 
@@ -76,8 +85,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         Toast.makeText(this,"Map is ready", Toast.LENGTH_LONG).show();
 
-        LatLng Facebook = new LatLng(53.3419,-6.2264);
-        googleMap.addMarker(new MarkerOptions().position(Facebook).title("UwU"));
+        //LatLng Facebook = new LatLng(53.3419,-6.2264);
+        //googleMap.addMarker(new MarkerOptions().position(Facebook).title("UwU"));
+
+        //////////
+        int[] colors = {
+                Color.rgb(255, 192, 203),
+                Color.rgb(255, 192, 203)
+        };
+
+        float[] startPoints = {
+                0.2f, 1f
+        };
+
+        Gradient gradient = new Gradient(colors, startPoints);
+
+        ////////
+       PacketReader packetReader = new PacketReader(MainActivity.this);
+        try {
+            packetReader.readPacketFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(packetReader.listOfLatLng).radius(20).opacity(.7).build();
+        googleMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        /*
+        for(MarkerOptions option : packetReader.markerList){
+            googleMap.addMarker(option);
+        }
+        */
+
         mMap = googleMap;
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
