@@ -44,27 +44,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-         Intent intent = VpnService.prepare(this);
-         if(intent != null){
-             startActivityForResult(intent, 0);
-         }else{
-             Log.d("test", "Intet: ELSE LOOP");
-            onActivityResult(0, RESULT_OK, null);
-         }
-        //packetVPN myVpm = new packetVPN();
-        //myVpm.run();
-        getLocationPermission();
+
+
+        //getLocationPermission();
 
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK){
-            Log.d("test", "Coo");
-            startService((new Intent(this, packetVPN.class)).setAction(packetVPN.ACTION_CONNECT));
-        }
-    }
+
 
 
 
