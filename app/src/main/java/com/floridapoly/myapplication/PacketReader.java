@@ -1,19 +1,16 @@
 package com.floridapoly.myapplication;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.content.Context;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-//PCAP repository
+
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
+import java.util.List;
 
 import io.pkts.PacketHandler;
 import io.pkts.Pcap;
 import io.pkts.buffer.Buffer;
-import io.pkts.frame.Frame;
-import io.pkts.framer.FramerManager;
 import io.pkts.framer.IPv6Framer;
 import io.pkts.packet.IPPacket;
 import io.pkts.packet.Packet;
@@ -21,45 +18,17 @@ import io.pkts.packet.TCPPacket;
 import io.pkts.packet.UDPPacket;
 import io.pkts.protocol.Protocol;
 
-public class testActivity extends AppCompatActivity {
-    public static final String TAG = "TestActivity";
+public class PacketReader {
+    public static final String TAG = "PacketReader.Class";
+    public List<LatLng> listOfLatLng;
+    private Context mContext;
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
-
-
-        Button readBtn = (Button) findViewById(R.id.test_btn_read);
-        Button mapBtn = (Button) findViewById(R.id.test_btn_map);
-
-
-        readBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    readPacketFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        mapBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(testActivity.this, MainActivity.class));
-            }
-        });
+    public PacketReader(Context context){
+        mContext = context;
     }
 
-
-
-    ////////////////////////////////////////////////////////////////////////
-    //Utility methods
-
     public void readPacketFile() throws IOException {
-        final Pcap pcap = Pcap.openStream(getAssets().open("general.pcap"));
+        final Pcap pcap = Pcap.openStream(mContext.getAssets().open("general.pcap"));
 
         final IPv6Framer iPv6Framer = new IPv6Framer();
 
@@ -102,5 +71,4 @@ public class testActivity extends AppCompatActivity {
         });
 
     }
-
 }

@@ -7,8 +7,11 @@
     android:orientation="vertical">
 
 
-
-
+    <Button
+        android:id="@+id/main_btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Back" />
 
     <fragment
         android:id="@+id/mapView"

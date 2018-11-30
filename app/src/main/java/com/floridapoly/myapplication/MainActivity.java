@@ -11,6 +11,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -18,16 +20,12 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback{
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(this,"Map is ready", Toast.LENGTH_LONG).show();
-        Log.d(TAG, "onmap: ready" + googleMap);
 
-        mMap = googleMap;
-    }
     private static final String TAG = "MainActivity";
 
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -39,48 +37,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Boolean mLocationPermissionGranted = false;
     private GoogleMap mMap;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
+        Button backBtn = (Button) findViewById(R.id.main_btn_back);
+
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, testActivity.class));
+            }
+        });
 
 
-        //getLocationPermission();
+        getLocationPermission();
 
 
     }
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    public boolean isServicesOK(){
-        Log.d(TAG, "isServicesOK: checking google services version");
-
-        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
-
-        if(available == ConnectionResult.SUCCESS){
-            //Everything is coo
-            Log.d(TAG, "isServicesOK: Services is working");
-
-        }
-        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)){
-            Log.d(TAG, "isServicesOK: ResolvableError");
-        }else{
-            Toast.makeText(this, "Can't make map", Toast.LENGTH_LONG).show();
-        }
-        return false;
-    }
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     private void initMap(){
         Log.d(TAG, "initmap: init");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
-        Log.d(TAG, "init map: fragment is " + mapFragment);
 
         mapFragment.getMapAsync(MainActivity.this);
     }
+////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Toast.makeText(this,"Map is ready", Toast.LENGTH_LONG).show();
+
+        LatLng Facebook = new LatLng(53.3419,-6.2264);
+        googleMap.addMarker(new MarkerOptions().position(Facebook).title("UwU"));
+        mMap = googleMap;
+    }
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     private void getLocationPermission(){
@@ -112,7 +112,25 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    public boolean isServicesOK(){
+        Log.d(TAG, "isServicesOK: checking google services version");
 
+        int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
+
+        if(available == ConnectionResult.SUCCESS){
+            //Everything is coo
+            Log.d(TAG, "isServicesOK: Services is working");
+
+        }
+        else if (GoogleApiAvailability.getInstance().isUserResolvableError(available)){
+            Log.d(TAG, "isServicesOK: ResolvableError");
+        }else{
+            Toast.makeText(this, "Can't make map", Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult: called");
@@ -135,6 +153,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
