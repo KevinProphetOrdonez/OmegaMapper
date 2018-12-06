@@ -7,11 +7,25 @@
     android:orientation="vertical">
 
 
-    <Button
-        android:id="@+id/main_btn_back"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Back" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/main_btn_marker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Marker" />
+
+        <Button
+            android:id="@+id/main_btn_back"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Back" />
+    </LinearLayout>
 
     <fragment
         android:id="@+id/mapView"

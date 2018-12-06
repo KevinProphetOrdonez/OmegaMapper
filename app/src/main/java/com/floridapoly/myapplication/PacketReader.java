@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 import io.pkts.PacketHandler;
 import io.pkts.Pcap;
@@ -26,6 +27,7 @@ public class PacketReader {
     public int packetsRead = 0;
     public List<LatLng> listOfLatLng = new ArrayList<>();
     public List<MarkerOptions> markerList = new ArrayList<MarkerOptions>();
+    public List<IpLatLng> uniqueIpLocations = new ArrayList<>();
     private Context mContext;
 
     public PacketReader(Context context){
@@ -76,6 +78,10 @@ public class PacketReader {
                 return true;
             }
         });
+        for (IpLatLng ip: uniqueIpLocations){
+            Log.d(TAG, "IP: "+ ip.getIp());
+        }
+
 
     }
 
@@ -85,26 +91,64 @@ public class PacketReader {
         if(sourceIP.equalsIgnoreCase("2603:9000:ad08:f800:586a:cb5:f62e:31c6")){
             return;
         }
+        IpLatLng nonUniqueIpLatLng = null;
         //DORIAN PLACE YOUR CODE HERE FOR EXTRACTING THE GEO LOCATION OF AN IP ADDRESS
+        boolean isUnique = true;
+        if (uniqueIpLocations.size() > 0){
+            for (IpLatLng ip: uniqueIpLocations){
+                if (ip.getIp().equals(sourceIP)){
+                    nonUniqueIpLatLng = ip;
+                    isUnique = false;
+                    break;
+                }
+            }
+        }
+        //Have to make this based on the
+        //If IP is unique, send to dorian
+        if(isUnique == true){
+            //I send IP Addresses
 
+            IPLocation locationHandler = new IPLocation();
+            try {
+                LatLng uniqueLocation = (locationHandler.execute(sourceIP).get());
+                if (uniqueLocation != null){
+                    IpLatLng ipLatLng = new IpLatLng(sourceIP, uniqueLocation.latitude, uniqueLocation.longitude);
+                    listOfLatLng.add(uniqueLocation);
+                    uniqueIpLocations.add(ipLatLng);
+                }
+
+
+                //Add this to a list of already known IP's
+                //Close thread
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+        }else{
+            if (nonUniqueIpLatLng != null){
+                LatLng nonUniqueLatLng = new LatLng(nonUniqueIpLatLng.getLat(),nonUniqueIpLatLng.getLng());
+                listOfLatLng.add(nonUniqueLatLng);
+
+            }
+        }
+        //Else
+            //Grab from dictionary of known locations
+            //Create new LatLng
+            //Insert into Heat Array
+        //
 
         //RANDOM FOR NOW
-        Random r = new Random();
-        double lat = -80 + (80 - (-80)) * r.nextDouble();
-        Log.d("GEO", "Lat: " + lat);
-        double lng = -170+ (170 - (-170)) * r.nextDouble();
-        Log.d("GEO", "Lng: " + lng);
-        Log.d("GEO", "Count: " + packetsRead);
+
 /////////////////////////
 
         ///////////////////////////////////////////
         //This is for Heatmap
-        LatLng geoTag = new LatLng(lat,lng);
-        listOfLatLng.add(geoTag);
 
         //this is for marker map
-        MarkerOptions tag = new MarkerOptions().position(geoTag);
-        markerList.add(tag);
+       // MarkerOptions tag = new MarkerOptions().position(geoTag);
+       // markerList.add(tag);
 
 
     }
